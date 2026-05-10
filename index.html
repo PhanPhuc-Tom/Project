@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkmate Lab — Chess Tactics Trainer</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <!--
+    chess.js – MIT license – legal move validation, check, checkmate, FEN parsing.
+    If CDN is unavailable, download from https://github.com/jhlywa/chess.js
+  -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     HOME SCREEN
+════════════════════════════════════════════════ -->
+<div id="screen-home" class="screen active">
+
+  <div class="home-bg" aria-hidden="true"></div>
+
+  <!-- Ambient floating pieces (decorative) -->
+  <div class="ambient" aria-hidden="true">
+    <span class="a a1">♜</span><span class="a a2">♞</span>
+    <span class="a a3">♛</span><span class="a a4">♝</span>
+    <span class="a a5">♚</span><span class="a a6">♟</span>
+  </div>
+
+  <div class="home-inner">
+
+    <!-- Brand -->
+    <div class="home-brand">
+      <span class="brand-glyph" aria-hidden="true">♟</span>
+      <span class="brand-name">CHECKMATE LAB</span>
+    </div>
+
+    <!-- Hero -->
+    <div class="hero">
+      <h1 class="hero-h1">TRAIN<br><em>LIKE A</em><br>MASTER</h1>
+      <p class="hero-sub">Real tactical puzzles. Sharp instant feedback.<br>Master-level ideas explained.</p>
+    </div>
+
+    <!-- Stats strip -->
+    <div class="stats-strip" id="home-stats">
+      <div class="stats-item">
+        <span class="stats-val" id="stat-solved">0</span>
+        <span class="stats-key">Solved</span>
+      </div>
+      <div class="stats-sep"></div>
+      <div class="stats-item">
+        <span class="stats-val" id="stat-acc">—</span>
+        <span class="stats-key">Accuracy</span>
+      </div>
+      <div class="stats-sep"></div>
+      <div class="stats-item">
+        <span class="stats-val" id="stat-streak">0</span>
+        <span class="stats-key">Best&nbsp;Streak</span>
+      </div>
+    </div>
+
+    <!-- CTAs -->
+    <div class="home-cta-group">
+      <button id="btn-start" class="cta-primary">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3l8 5-8 5V3z"/></svg>
+        Start Training
+      </button>
+      <button id="btn-random" class="cta-outline">Surprise Me</button>
+    </div>
+
+    <!-- Theme pills -->
+    <div class="theme-section">
+      <div class="theme-section-label">
+        <span class="tsep"></span>
+        <span>Jump to a theme</span>
+        <span class="tsep"></span>
+      </div>
+      <div class="theme-pills" id="theme-pills"><!-- filled by JS --></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     TRAINING SCREEN
+════════════════════════════════════════════════ -->
+<div id="screen-training" class="screen">
+
+  <!-- ── Nav bar ── -->
+  <nav class="train-nav">
+    <button id="btn-home" class="nav-brand-btn" aria-label="Home">
+      <span class="nav-glyph" aria-hidden="true">♟</span>
+      <span class="nav-wordmark">CHECKMATE LAB</span>
+    </button>
+
+    <div class="nav-pager">
+      <button class="pager-btn" id="btn-prev" aria-label="Previous puzzle">&#8249;</button>
+      <span class="pager-info" id="puzzle-num" aria-live="polite">1 / 13</span>
+      <button class="pager-btn" id="btn-next" aria-label="Next puzzle">&#8250;</button>
+    </div>
+
+    <div class="nav-end">
+      <span class="nav-streak" id="nav-streak">
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1C5 5 2 7.5 2 11a6 6 0 0 0 12 0c0-3.5-3-6-6-10zm0 2.5c1.5 2.5 3.5 4.5 3.5 7.5a3.5 3.5 0 0 1-7 0C4.5 8 6.5 6 8 3.5z"/></svg>
+        <span id="streak-val">0</span>
+      </span>
+      <span class="nav-solved" id="nav-solved">0 solved</span>
+    </div>
+  </nav>
+
+  <!-- ── Body: board + panel ── -->
+  <div class="train-body">
+
+    <!-- Board column -->
+    <div class="board-col">
+      <div class="board-wrap">
+        <div class="board-ranks" id="rank-labels" aria-hidden="true"></div>
+        <div id="board" class="chessboard" role="grid" aria-label="Chess board"></div>
+      </div>
+      <div class="board-files-row">
+        <div class="board-files-offset" aria-hidden="true"></div>
+        <div class="board-files" id="file-labels" aria-hidden="true"></div>
+      </div>
+      <div class="board-actions">
+        <button id="btn-flip" class="board-action-btn">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 4H3M13 4l-3-3M13 4l-3 3M3 12h10M3 12l3-3M3 12l3 3"/></svg>
+          Flip Board
+        </button>
+        <button id="btn-reset" class="board-action-btn">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 1 0 1.2-3.6L2 2v4h4"/></svg>
+          Reset
+        </button>
+      </div>
+      <div class="kbd-row" aria-hidden="true">
+        <kbd>H</kbd> hint &ensp;
+        <kbd>F</kbd> flip &ensp;
+        <kbd>←</kbd><kbd>→</kbd> navigate
+      </div>
+    </div>
+
+    <!-- Learning panel -->
+    <aside class="panel-col" aria-label="Puzzle panel">
+
+      <div class="panel-badges">
+        <span class="badge badge-theme" id="meta-theme">Fork</span>
+        <span class="badge badge-diff"  id="meta-diff">Beginner</span>
+        <span class="badge badge-turn"  id="meta-turn">White to move</span>
+      </div>
+
+      <p class="panel-prompt" id="panel-instruction">Find the best move.</p>
+
+      <div class="feedback-card" id="feedback-card" role="status" aria-live="polite">
+        <span class="fb-icon" id="fb-icon" aria-hidden="true"></span>
+        <span class="fb-text" id="fb-msg">Select a piece to begin.</span>
+      </div>
+
+      <div class="panel-btn-row">
+        <button id="btn-hint" class="btn-hint">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 11v-1m0-5a2 2 0 1 1 0 4"/></svg>
+          Hint
+        </button>
+        <button id="btn-next-puzzle" class="btn-next hidden">
+          Next Puzzle
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+
+      <!-- Explanation (revealed after solve) -->
+      <div class="reveal-card hidden" id="exp-card">
+        <div class="reveal-header">
+          <span class="reveal-dot"></span>
+          <span class="reveal-label">Why this works</span>
+        </div>
+        <p class="reveal-body" id="exp-body"></p>
+      </div>
+
+      <!-- Master examples (revealed after solve) -->
+      <div class="reveal-card reveal-card--gold hidden" id="master-card">
+        <div class="reveal-header">
+          <span class="reveal-dot reveal-dot--gold"></span>
+          <span class="reveal-label">Master examples</span>
+        </div>
+        <div class="master-list" id="master-list"></div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="panel-progress">
+        <div class="progress-bar">
+          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <div class="progress-meta">
+          <span id="progress-text">0 / 13 completed</span>
+          <span id="progress-pct">0%</span>
+        </div>
+      </div>
+
+    </aside>
+
+  </div><!-- /.train-body -->
+
+</div><!-- /#screen-training -->
+
+<script src="script.js"></script>
+</body>
+</html>
