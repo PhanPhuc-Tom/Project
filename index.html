@@ -3,150 +3,134 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkmate Lab — Chess Tactics & Openings Trainer</title>
+  <title>Checkmate Lab — Chess Academy</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
-  <!--
-    chess.js – MIT license – legal move validation, check, checkmate, FEN parsing.
-    Piece artwork: cburnett SVG (CC BY-SA 3.0) via Wikimedia Commons — same set used by Lichess.
-  -->
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 </head>
 <body>
 
 <!-- ════════════════════════════════════════════
-     HOME SCREEN
+     HOME — Academy landing
 ════════════════════════════════════════════════ -->
 <div id="screen-home" class="screen active">
 
   <div class="home-bg" aria-hidden="true"></div>
 
-  <!-- Ambient floating pieces (decorative) -->
-  <div class="ambient" aria-hidden="true">
-    <span class="a a1">♜</span><span class="a a2">♞</span>
-    <span class="a a3">♛</span><span class="a a4">♝</span>
-    <span class="a a5">♚</span><span class="a a6">♟</span>
-  </div>
-
-  <div class="home-inner">
-
-    <!-- Brand -->
-    <div class="home-brand">
-      <span class="brand-glyph" aria-hidden="true">♟</span>
-      <span class="brand-name">CHECKMATE LAB</span>
+  <header class="academy-bar">
+    <div class="academy-brand">
+      <span class="brand-mark" aria-hidden="true">♟</span>
+      <span class="brand-text">
+        <span class="brand-name">Checkmate Lab</span>
+        <span class="brand-tag">Chess Academy · est. 2024</span>
+      </span>
     </div>
+    <nav class="academy-nav">
+      <button class="ac-nav-link" data-go="puzzles">Puzzles</button>
+      <button class="ac-nav-link" data-go="openings">Openings</button>
+      <button class="ac-nav-link" data-go="random">Random</button>
+    </nav>
+  </header>
 
-    <!-- Hero -->
-    <div class="hero">
-      <h1 class="hero-h1">TRAIN<br><em>LIKE A</em><br>MASTER</h1>
-      <p class="hero-sub">Sharp tactical puzzles. Classical openings.<br>Master-level ideas explained.</p>
-    </div>
+  <main class="academy-main">
 
-    <!-- Stats strip -->
-    <div class="stats-strip" id="home-stats">
-      <div class="stats-item">
-        <span class="stats-val" id="stat-solved">0</span>
-        <span class="stats-key">Solved</span>
-      </div>
-      <div class="stats-sep"></div>
-      <div class="stats-item">
-        <span class="stats-val" id="stat-acc">—</span>
-        <span class="stats-key">Accuracy</span>
-      </div>
-      <div class="stats-sep"></div>
-      <div class="stats-item">
-        <span class="stats-val" id="stat-openings">0</span>
-        <span class="stats-key">Openings</span>
-      </div>
-      <div class="stats-sep"></div>
-      <div class="stats-item">
-        <span class="stats-val" id="stat-streak">0</span>
-        <span class="stats-key">Best&nbsp;Streak</span>
-      </div>
-    </div>
+    <section class="hero-pane">
+      <span class="eyebrow">A SERIOUS PRACTICE TOOL</span>
+      <h1 class="hero-title">Train with the<br><em>precision</em> of a master.</h1>
+      <p class="hero-lede">A modern dark studio for tactics, openings, and free-play
+        practice — with an in-browser engine that explains
+        <em>why</em> your move wasn't the best.</p>
 
-    <!-- Mode cards -->
-    <div class="mode-grid">
-      <button id="btn-mode-puzzles" class="mode-card">
-        <div class="mode-icon">⚔</div>
-        <div class="mode-text">
-          <div class="mode-title">Tactical Puzzles</div>
-          <div class="mode-sub">Forks · pins · skewers · mates</div>
+      <div class="hero-actions">
+        <button id="btn-mode-puzzles" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3l8 5-8 5V3z"/></svg>
+          Begin tactical training
+        </button>
+        <button id="btn-mode-openings" class="btn-ghost">
+          Browse opening repertoire
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+        </button>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi"><span class="kpi-val" id="stat-solved">0</span><span class="kpi-key">Puzzles solved</span></div>
+        <div class="kpi"><span class="kpi-val" id="stat-acc">—</span><span class="kpi-key">Accuracy</span></div>
+        <div class="kpi"><span class="kpi-val" id="stat-openings">0</span><span class="kpi-key">Openings studied</span></div>
+        <div class="kpi"><span class="kpi-val" id="stat-streak">0</span><span class="kpi-key">Best streak</span></div>
+      </div>
+    </section>
+
+    <aside class="featured-pane">
+      <div class="featured-card featured-card--gold">
+        <div class="fc-head">
+          <span class="fc-eyebrow">Course I · Tactics</span>
+          <span class="fc-count" id="fc-puzzle-count">13 studies</span>
         </div>
-        <div class="mode-arrow">›</div>
-      </button>
-      <button id="btn-mode-openings" class="mode-card">
-        <div class="mode-icon">♟</div>
-        <div class="mode-text">
-          <div class="mode-title">Opening Repertoire</div>
-          <div class="mode-sub">Italian · Ruy Lopez · Sicilian · QGD…</div>
-        </div>
-        <div class="mode-arrow">›</div>
-      </button>
-    </div>
-
-    <!-- CTAs -->
-    <div class="home-cta-group">
-      <button id="btn-start" class="cta-primary">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3l8 5-8 5V3z"/></svg>
-        Start Training
-      </button>
-      <button id="btn-random" class="cta-outline">Surprise Me</button>
-    </div>
-
-    <!-- Theme pills -->
-    <div class="theme-section">
-      <div class="theme-section-label">
-        <span class="tsep"></span>
-        <span>Jump to a theme</span>
-        <span class="tsep"></span>
+        <h3 class="fc-title">Forks, pins, skewers &amp; mates.</h3>
+        <p class="fc-sub">Hand-picked positions with master-level commentary, hints, and explanations of every idea.</p>
+        <button class="fc-btn" data-go="puzzles">Open course <span aria-hidden="true">→</span></button>
       </div>
-      <div class="theme-pills" id="theme-pills"><!-- filled by JS --></div>
-    </div>
 
-  </div>
+      <div class="featured-card">
+        <div class="fc-head">
+          <span class="fc-eyebrow">Course II · Openings</span>
+          <span class="fc-count" id="fc-opening-count">10 openings</span>
+        </div>
+        <h3 class="fc-title">Classical opening repertoire.</h3>
+        <p class="fc-sub">Italian, Ruy Lopez, Sicilian, French, Caro-Kann, QGD, London, KID, Scandinavian, Vienna — with practice mode and free-play feedback.</p>
+        <button class="fc-btn" data-go="openings">Open course <span aria-hidden="true">→</span></button>
+      </div>
+
+      <div class="featured-card featured-card--quiet">
+        <div class="fc-eyebrow">By theme</div>
+        <div class="theme-pills" id="theme-pills"></div>
+      </div>
+    </aside>
+
+  </main>
+
 </div>
 
 
 <!-- ════════════════════════════════════════════
-     TRAINING SCREEN (PUZZLES)
+     TRAINING — Puzzles
 ════════════════════════════════════════════════ -->
 <div id="screen-training" class="screen">
 
-  <!-- ── Nav bar ── -->
   <nav class="train-nav">
     <button id="btn-home" class="nav-brand-btn" aria-label="Home">
       <span class="nav-glyph" aria-hidden="true">♟</span>
-      <span class="nav-wordmark">CHECKMATE LAB</span>
+      <span class="nav-wordmark">Checkmate Lab</span>
     </button>
 
-    <div class="nav-pager">
-      <button class="pager-btn" id="btn-prev" aria-label="Previous puzzle">&#8249;</button>
-      <span class="pager-info" id="puzzle-num" aria-live="polite">1 / 13</span>
-      <button class="pager-btn" id="btn-next" aria-label="Next puzzle">&#8250;</button>
+    <div class="nav-center">
+      <div class="nav-pager">
+        <button class="pager-btn" id="btn-prev" aria-label="Previous puzzle">&#8249;</button>
+        <span class="pager-info" id="puzzle-num" aria-live="polite">1 / 13</span>
+        <button class="pager-btn" id="btn-next" aria-label="Next puzzle">&#8250;</button>
+      </div>
     </div>
 
     <div class="nav-end">
-      <button class="nav-tab" id="btn-goto-openings" title="Switch to openings">Openings</button>
-      <span class="nav-streak" id="nav-streak">
-        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1C5 5 2 7.5 2 11a6 6 0 0 0 12 0c0-3.5-3-6-6-10zm0 2.5c1.5 2.5 3.5 4.5 3.5 7.5a3.5 3.5 0 0 1-7 0C4.5 8 6.5 6 8 3.5z"/></svg>
+      <button class="nav-tab" id="btn-goto-openings">Openings</button>
+      <span class="nav-streak" id="nav-streak"
+        title="Current streak"
+      >
+        <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1C5 5 2 7.5 2 11a6 6 0 0 0 12 0c0-3.5-3-6-6-10z"/></svg>
         <span id="streak-val">0</span>
       </span>
       <span class="nav-solved" id="nav-solved">0 solved</span>
       <button id="btn-sound" class="icon-btn" aria-label="Toggle sound">
-        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path id="sound-icon-on" d="M3 6v4h2.5L9 13V3L5.5 6H3zM11 8a3 3 0 0 0-1.5-2.6v5.2A3 3 0 0 0 11 8z"/></svg>
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3 6v4h2.5L9 13V3L5.5 6H3zM11 8a3 3 0 0 0-1.5-2.6v5.2A3 3 0 0 0 11 8z"/></svg>
       </button>
     </div>
   </nav>
 
-  <!-- ── Body: board + panel ── -->
   <div class="train-body">
 
-    <!-- Board column -->
     <div class="board-col">
-      <!-- Captured pieces tray (top) -->
       <div class="captured-tray captured-tray--top" id="cap-top" aria-hidden="true"></div>
 
       <div class="board-wrap">
@@ -158,27 +142,17 @@
         <div class="board-files" id="file-labels" aria-hidden="true"></div>
       </div>
 
-      <!-- Captured pieces tray (bottom) -->
       <div class="captured-tray captured-tray--bottom" id="cap-bot" aria-hidden="true"></div>
 
       <div class="board-actions">
-        <button id="btn-flip" class="board-action-btn">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 4H3M13 4l-3-3M13 4l-3 3M3 12h10M3 12l3-3M3 12l3 3"/></svg>
-          Flip Board
-        </button>
-        <button id="btn-reset" class="board-action-btn">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 8a6 6 0 1 0 1.2-3.6L2 2v4h4"/></svg>
-          Reset
-        </button>
+        <button id="btn-flip" class="board-action-btn">Flip</button>
+        <button id="btn-reset" class="board-action-btn">Reset</button>
       </div>
       <div class="kbd-row" aria-hidden="true">
-        <kbd>H</kbd> hint &ensp;
-        <kbd>F</kbd> flip &ensp;
-        <kbd>←</kbd><kbd>→</kbd> navigate
+        <kbd>H</kbd> hint &ensp; <kbd>F</kbd> flip &ensp; <kbd>←</kbd><kbd>→</kbd> navigate
       </div>
     </div>
 
-    <!-- Learning panel -->
     <aside class="panel-col" aria-label="Puzzle panel">
 
       <div class="panel-badges">
@@ -187,7 +161,7 @@
         <span class="badge badge-turn"  id="meta-turn">White to move</span>
       </div>
 
-      <p class="panel-prompt" id="panel-instruction">Find the best move.</p>
+      <h2 class="panel-prompt" id="panel-instruction">Find the best move.</h2>
 
       <div class="feedback-card" id="feedback-card" role="status" aria-live="polite">
         <span class="fb-icon" id="fb-icon" aria-hidden="true"></span>
@@ -195,48 +169,31 @@
       </div>
 
       <div class="panel-btn-row">
-        <button id="btn-hint" class="btn-hint">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="8" r="6"/><path d="M8 11v-1m0-5a2 2 0 1 1 0 4"/></svg>
-          Hint
-        </button>
+        <button id="btn-hint" class="btn-amber">Hint</button>
+        <button id="btn-why" class="btn-ghost-sm hidden">Why?</button>
         <button id="btn-next-puzzle" class="btn-next hidden">
           Next Puzzle
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
         </button>
       </div>
 
-      <!-- Move history -->
-      <div class="move-history" id="move-history-wrap">
-        <div class="mh-header">
-          <span class="mh-dot"></span>
-          <span class="mh-label">Move List</span>
-        </div>
+      <div class="move-history">
+        <div class="mh-header"><span class="mh-dot"></span><span class="mh-label">Move List</span></div>
         <div class="mh-list" id="move-list"><span class="mh-empty">No moves yet.</span></div>
       </div>
 
-      <!-- Explanation (revealed after solve) -->
       <div class="reveal-card hidden" id="exp-card">
-        <div class="reveal-header">
-          <span class="reveal-dot"></span>
-          <span class="reveal-label">Why this works</span>
-        </div>
+        <div class="reveal-header"><span class="reveal-dot"></span><span class="reveal-label">Why this works</span></div>
         <p class="reveal-body" id="exp-body"></p>
       </div>
 
-      <!-- Master examples (revealed after solve) -->
       <div class="reveal-card reveal-card--gold hidden" id="master-card">
-        <div class="reveal-header">
-          <span class="reveal-dot reveal-dot--gold"></span>
-          <span class="reveal-label">Master examples</span>
-        </div>
+        <div class="reveal-header"><span class="reveal-dot reveal-dot--gold"></span><span class="reveal-label">Master examples</span></div>
         <div class="master-list" id="master-list"></div>
       </div>
 
-      <!-- Progress bar -->
       <div class="panel-progress">
-        <div class="progress-bar">
-          <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
-        </div>
+        <div class="progress-bar"><div class="progress-bar-fill" id="progress-fill" style="width:0%"></div></div>
         <div class="progress-meta">
           <span id="progress-text">0 / 13 completed</span>
           <span id="progress-pct">0%</span>
@@ -245,30 +202,31 @@
 
     </aside>
 
-  </div><!-- /.train-body -->
-
-</div><!-- /#screen-training -->
+  </div>
+</div>
 
 
 <!-- ════════════════════════════════════════════
-     OPENINGS SCREEN
+     OPENINGS — Study / Practice / Play On
 ════════════════════════════════════════════════ -->
 <div id="screen-openings" class="screen">
 
   <nav class="train-nav">
     <button id="btn-home-2" class="nav-brand-btn" aria-label="Home">
       <span class="nav-glyph" aria-hidden="true">♟</span>
-      <span class="nav-wordmark">CHECKMATE LAB</span>
+      <span class="nav-wordmark">Checkmate Lab</span>
     </button>
 
-    <div class="nav-pager">
-      <button class="pager-btn" id="btn-op-prev" aria-label="Previous opening">&#8249;</button>
-      <span class="pager-info" id="op-num">1 / 10</span>
-      <button class="pager-btn" id="btn-op-next" aria-label="Next opening">&#8250;</button>
+    <div class="nav-center">
+      <div class="nav-pager">
+        <button class="pager-btn" id="btn-op-prev" aria-label="Previous opening">&#8249;</button>
+        <span class="pager-info" id="op-num">1 / 10</span>
+        <button class="pager-btn" id="btn-op-next" aria-label="Next opening">&#8250;</button>
+      </div>
     </div>
 
     <div class="nav-end">
-      <button class="nav-tab" id="btn-goto-puzzles" title="Switch to puzzles">Puzzles</button>
+      <button class="nav-tab" id="btn-goto-puzzles">Puzzles</button>
       <span class="nav-solved" id="nav-op-progress">0 studied</span>
     </div>
   </nav>
@@ -285,27 +243,34 @@
         <div class="board-files" id="op-file-labels" aria-hidden="true"></div>
       </div>
 
-      <div class="board-actions">
-        <button id="btn-op-first" class="board-action-btn" title="Start">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v10M13 4l-6 4 6 4V4z"/></svg>
-          Start
-        </button>
-        <button id="btn-op-back" class="board-action-btn" title="Back">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l-5 4 5 4V4z"/></svg>
-          Back
-        </button>
-        <button id="btn-op-step" class="board-action-btn board-action-btn--primary" title="Next move">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l5 4-5 4V4z"/></svg>
-          Next
-        </button>
-        <button id="btn-op-auto" class="board-action-btn" title="Auto play through opening">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M7 6l3 2-3 2V6z" fill="currentColor"/></svg>
-          Play
-        </button>
-        <button id="btn-op-flip" class="board-action-btn" title="Flip board">
-          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4H3M13 4l-3-3M13 4l-3 3M3 12h10M3 12l3-3M3 12l3 3"/></svg>
-          Flip
-        </button>
+      <!-- Engine eval bar (visible in play mode) -->
+      <div class="eval-bar hidden" id="eval-bar" aria-hidden="true">
+        <div class="eval-fill" id="eval-fill" style="height:50%"></div>
+        <span class="eval-text" id="eval-text">0.00</span>
+      </div>
+
+      <!-- STUDY mode actions -->
+      <div class="board-actions op-actions" id="op-actions-study">
+        <button id="btn-op-first" class="board-action-btn">⏮ Start</button>
+        <button id="btn-op-back" class="board-action-btn">◀ Back</button>
+        <button id="btn-op-step" class="board-action-btn board-action-btn--primary">Next ▶</button>
+        <button id="btn-op-auto" class="board-action-btn">Auto</button>
+        <button id="btn-op-flip" class="board-action-btn">Flip</button>
+      </div>
+
+      <!-- PRACTICE mode actions -->
+      <div class="board-actions op-actions hidden" id="op-actions-practice">
+        <button id="btn-pr-hint" class="board-action-btn">Hint</button>
+        <button id="btn-pr-reset" class="board-action-btn">Restart</button>
+        <button id="btn-pr-flip" class="board-action-btn">Flip</button>
+      </div>
+
+      <!-- PLAY ON mode actions -->
+      <div class="board-actions op-actions hidden" id="op-actions-play">
+        <button id="btn-play-why" class="board-action-btn">Why?</button>
+        <button id="btn-play-takeback" class="board-action-btn">Take back</button>
+        <button id="btn-play-restart" class="board-action-btn">Restart</button>
+        <button id="btn-play-flip" class="board-action-btn">Flip</button>
       </div>
     </div>
 
@@ -320,45 +285,98 @@
       <h2 class="panel-prompt op-title" id="op-title">Italian Game</h2>
       <p class="op-summary" id="op-summary">A classical opening…</p>
 
-      <div class="reveal-card op-current">
-        <div class="reveal-header">
-          <span class="reveal-dot"></span>
-          <span class="reveal-label" id="op-move-label">Move 1 · 1.e4</span>
-        </div>
-        <p class="reveal-body" id="op-move-note">Begin the opening — click "Next" to play through the moves.</p>
+      <!-- Sub-mode tabs -->
+      <div class="op-tabs" role="tablist">
+        <button class="op-tab active" data-mode="study"    role="tab">📖 Study</button>
+        <button class="op-tab"        data-mode="practice" role="tab">🎯 Practice</button>
+        <button class="op-tab"        data-mode="play"     role="tab">⚔ Play On</button>
       </div>
 
-      <div class="reveal-card reveal-card--gold">
-        <div class="reveal-header">
-          <span class="reveal-dot reveal-dot--gold"></span>
-          <span class="reveal-label">Strategic plans</span>
+      <!-- STUDY pane -->
+      <div class="op-pane" id="pane-study">
+        <div class="reveal-card op-current">
+          <div class="reveal-header">
+            <span class="reveal-dot"></span>
+            <span class="reveal-label" id="op-move-label">Move 1</span>
+          </div>
+          <p class="reveal-body" id="op-move-note">Click "Next" to play through the moves of the opening.</p>
         </div>
-        <ul class="op-plans" id="op-plans"></ul>
+
+        <div class="reveal-card reveal-card--gold">
+          <div class="reveal-header"><span class="reveal-dot reveal-dot--gold"></span><span class="reveal-label">Strategic plans</span></div>
+          <ul class="op-plans" id="op-plans"></ul>
+        </div>
+
+        <div class="move-history">
+          <div class="mh-header"><span class="mh-dot"></span><span class="mh-label">Variation</span></div>
+          <div class="mh-list" id="op-move-tape"></div>
+        </div>
       </div>
 
-      <!-- Move tape -->
-      <div class="move-history">
-        <div class="mh-header">
-          <span class="mh-dot"></span>
-          <span class="mh-label">Variation</span>
+      <!-- PRACTICE pane -->
+      <div class="op-pane hidden" id="pane-practice">
+        <div class="reveal-card op-current">
+          <div class="reveal-header">
+            <span class="reveal-dot"></span>
+            <span class="reveal-label">Practice from memory</span>
+          </div>
+          <p class="reveal-body" id="practice-prompt">Play the moves of the opening from the starting position.</p>
         </div>
-        <div class="mh-list" id="op-move-tape"></div>
+
+        <div class="feedback-card" id="practice-feedback">
+          <span class="fb-icon" id="practice-fb-icon">♟</span>
+          <span class="fb-text" id="practice-fb-msg">Your move.</span>
+        </div>
+
+        <div class="move-history">
+          <div class="mh-header">
+            <span class="mh-dot"></span>
+            <span class="mh-label">Progress · <span id="practice-progress">0 / 0</span></span>
+          </div>
+          <div class="mh-list" id="practice-tape"></div>
+        </div>
+
+        <p class="muted-note">Practice plays the opening from the standard starting position. Your opponent's moves are played automatically — focus on memorizing your side's moves.</p>
       </div>
 
-      <!-- Opening directory -->
+      <!-- PLAY pane -->
+      <div class="op-pane hidden" id="pane-play">
+        <div class="reveal-card op-current">
+          <div class="reveal-header">
+            <span class="reveal-dot"></span>
+            <span class="reveal-label">Position from this opening</span>
+          </div>
+          <p class="reveal-body" id="play-prompt">After the opening moves are played, continue the game against the built-in engine. Each of your moves is rated and explained.</p>
+        </div>
+
+        <div class="feedback-card" id="play-feedback">
+          <span class="fb-icon" id="play-fb-icon">⚔</span>
+          <span class="fb-text" id="play-fb-msg">Make a move to start.</span>
+        </div>
+
+        <div class="why-card hidden" id="why-card">
+          <div class="reveal-header"><span class="reveal-dot reveal-dot--gold"></span><span class="reveal-label">Engine analysis</span></div>
+          <p class="reveal-body" id="why-body"></p>
+        </div>
+
+        <div class="move-history">
+          <div class="mh-header"><span class="mh-dot"></span><span class="mh-label">Game</span></div>
+          <div class="mh-list" id="play-tape"><span class="mh-empty">No moves yet.</span></div>
+        </div>
+
+        <p class="muted-note">The engine plays at study strength (depth 2) so you can focus on ideas. Use <b>Why?</b> after a move to see what the engine recommends and why.</p>
+      </div>
+
+      <!-- Opening directory (shared) -->
       <div class="op-directory">
-        <div class="reveal-header">
-          <span class="reveal-dot"></span>
-          <span class="reveal-label">All openings</span>
-        </div>
+        <div class="reveal-header"><span class="reveal-dot"></span><span class="reveal-label">All openings</span></div>
         <div class="op-list" id="op-list"></div>
       </div>
 
     </aside>
 
   </div>
-
-</div><!-- /#screen-openings -->
+</div>
 
 <script src="script.js"></script>
 </body>
