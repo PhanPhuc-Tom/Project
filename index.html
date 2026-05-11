@@ -3,13 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Checkmate Lab — Chess Tactics Trainer</title>
+  <title>Checkmate Lab — Chess Tactics & Openings Trainer</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://upload.wikimedia.org" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
   <!--
     chess.js – MIT license – legal move validation, check, checkmate, FEN parsing.
-    If CDN is unavailable, download from https://github.com/jhlywa/chess.js
+    Piece artwork: cburnett SVG (CC BY-SA 3.0) via Wikimedia Commons — same set used by Lichess.
   -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
 </head>
@@ -40,7 +41,7 @@
     <!-- Hero -->
     <div class="hero">
       <h1 class="hero-h1">TRAIN<br><em>LIKE A</em><br>MASTER</h1>
-      <p class="hero-sub">Real tactical puzzles. Sharp instant feedback.<br>Master-level ideas explained.</p>
+      <p class="hero-sub">Sharp tactical puzzles. Classical openings.<br>Master-level ideas explained.</p>
     </div>
 
     <!-- Stats strip -->
@@ -56,9 +57,34 @@
       </div>
       <div class="stats-sep"></div>
       <div class="stats-item">
+        <span class="stats-val" id="stat-openings">0</span>
+        <span class="stats-key">Openings</span>
+      </div>
+      <div class="stats-sep"></div>
+      <div class="stats-item">
         <span class="stats-val" id="stat-streak">0</span>
         <span class="stats-key">Best&nbsp;Streak</span>
       </div>
+    </div>
+
+    <!-- Mode cards -->
+    <div class="mode-grid">
+      <button id="btn-mode-puzzles" class="mode-card">
+        <div class="mode-icon">⚔</div>
+        <div class="mode-text">
+          <div class="mode-title">Tactical Puzzles</div>
+          <div class="mode-sub">Forks · pins · skewers · mates</div>
+        </div>
+        <div class="mode-arrow">›</div>
+      </button>
+      <button id="btn-mode-openings" class="mode-card">
+        <div class="mode-icon">♟</div>
+        <div class="mode-text">
+          <div class="mode-title">Opening Repertoire</div>
+          <div class="mode-sub">Italian · Ruy Lopez · Sicilian · QGD…</div>
+        </div>
+        <div class="mode-arrow">›</div>
+      </button>
     </div>
 
     <!-- CTAs -->
@@ -85,7 +111,7 @@
 
 
 <!-- ════════════════════════════════════════════
-     TRAINING SCREEN
+     TRAINING SCREEN (PUZZLES)
 ════════════════════════════════════════════════ -->
 <div id="screen-training" class="screen">
 
@@ -103,11 +129,15 @@
     </div>
 
     <div class="nav-end">
+      <button class="nav-tab" id="btn-goto-openings" title="Switch to openings">Openings</button>
       <span class="nav-streak" id="nav-streak">
         <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M8 1C5 5 2 7.5 2 11a6 6 0 0 0 12 0c0-3.5-3-6-6-10zm0 2.5c1.5 2.5 3.5 4.5 3.5 7.5a3.5 3.5 0 0 1-7 0C4.5 8 6.5 6 8 3.5z"/></svg>
         <span id="streak-val">0</span>
       </span>
       <span class="nav-solved" id="nav-solved">0 solved</span>
+      <button id="btn-sound" class="icon-btn" aria-label="Toggle sound">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path id="sound-icon-on" d="M3 6v4h2.5L9 13V3L5.5 6H3zM11 8a3 3 0 0 0-1.5-2.6v5.2A3 3 0 0 0 11 8z"/></svg>
+      </button>
     </div>
   </nav>
 
@@ -116,6 +146,9 @@
 
     <!-- Board column -->
     <div class="board-col">
+      <!-- Captured pieces tray (top) -->
+      <div class="captured-tray captured-tray--top" id="cap-top" aria-hidden="true"></div>
+
       <div class="board-wrap">
         <div class="board-ranks" id="rank-labels" aria-hidden="true"></div>
         <div id="board" class="chessboard" role="grid" aria-label="Chess board"></div>
@@ -124,6 +157,10 @@
         <div class="board-files-offset" aria-hidden="true"></div>
         <div class="board-files" id="file-labels" aria-hidden="true"></div>
       </div>
+
+      <!-- Captured pieces tray (bottom) -->
+      <div class="captured-tray captured-tray--bottom" id="cap-bot" aria-hidden="true"></div>
+
       <div class="board-actions">
         <button id="btn-flip" class="board-action-btn">
           <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 4H3M13 4l-3-3M13 4l-3 3M3 12h10M3 12l3-3M3 12l3 3"/></svg>
@@ -168,6 +205,15 @@
         </button>
       </div>
 
+      <!-- Move history -->
+      <div class="move-history" id="move-history-wrap">
+        <div class="mh-header">
+          <span class="mh-dot"></span>
+          <span class="mh-label">Move List</span>
+        </div>
+        <div class="mh-list" id="move-list"><span class="mh-empty">No moves yet.</span></div>
+      </div>
+
       <!-- Explanation (revealed after solve) -->
       <div class="reveal-card hidden" id="exp-card">
         <div class="reveal-header">
@@ -202,6 +248,117 @@
   </div><!-- /.train-body -->
 
 </div><!-- /#screen-training -->
+
+
+<!-- ════════════════════════════════════════════
+     OPENINGS SCREEN
+════════════════════════════════════════════════ -->
+<div id="screen-openings" class="screen">
+
+  <nav class="train-nav">
+    <button id="btn-home-2" class="nav-brand-btn" aria-label="Home">
+      <span class="nav-glyph" aria-hidden="true">♟</span>
+      <span class="nav-wordmark">CHECKMATE LAB</span>
+    </button>
+
+    <div class="nav-pager">
+      <button class="pager-btn" id="btn-op-prev" aria-label="Previous opening">&#8249;</button>
+      <span class="pager-info" id="op-num">1 / 10</span>
+      <button class="pager-btn" id="btn-op-next" aria-label="Next opening">&#8250;</button>
+    </div>
+
+    <div class="nav-end">
+      <button class="nav-tab" id="btn-goto-puzzles" title="Switch to puzzles">Puzzles</button>
+      <span class="nav-solved" id="nav-op-progress">0 studied</span>
+    </div>
+  </nav>
+
+  <div class="train-body">
+
+    <div class="board-col">
+      <div class="board-wrap">
+        <div class="board-ranks" id="op-rank-labels" aria-hidden="true"></div>
+        <div id="op-board" class="chessboard" role="grid" aria-label="Opening board"></div>
+      </div>
+      <div class="board-files-row">
+        <div class="board-files-offset" aria-hidden="true"></div>
+        <div class="board-files" id="op-file-labels" aria-hidden="true"></div>
+      </div>
+
+      <div class="board-actions">
+        <button id="btn-op-first" class="board-action-btn" title="Start">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v10M13 4l-6 4 6 4V4z"/></svg>
+          Start
+        </button>
+        <button id="btn-op-back" class="board-action-btn" title="Back">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 4l-5 4 5 4V4z"/></svg>
+          Back
+        </button>
+        <button id="btn-op-step" class="board-action-btn board-action-btn--primary" title="Next move">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4l5 4-5 4V4z"/></svg>
+          Next
+        </button>
+        <button id="btn-op-auto" class="board-action-btn" title="Auto play through opening">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="6"/><path d="M7 6l3 2-3 2V6z" fill="currentColor"/></svg>
+          Play
+        </button>
+        <button id="btn-op-flip" class="board-action-btn" title="Flip board">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 4H3M13 4l-3-3M13 4l-3 3M3 12h10M3 12l3-3M3 12l3 3"/></svg>
+          Flip
+        </button>
+      </div>
+    </div>
+
+    <aside class="panel-col" aria-label="Opening panel">
+
+      <div class="panel-badges">
+        <span class="badge badge-theme" id="op-meta-eco">C50</span>
+        <span class="badge badge-diff"  id="op-meta-cat">Open Game</span>
+        <span class="badge badge-turn"  id="op-meta-side">For White</span>
+      </div>
+
+      <h2 class="panel-prompt op-title" id="op-title">Italian Game</h2>
+      <p class="op-summary" id="op-summary">A classical opening…</p>
+
+      <div class="reveal-card op-current">
+        <div class="reveal-header">
+          <span class="reveal-dot"></span>
+          <span class="reveal-label" id="op-move-label">Move 1 · 1.e4</span>
+        </div>
+        <p class="reveal-body" id="op-move-note">Begin the opening — click "Next" to play through the moves.</p>
+      </div>
+
+      <div class="reveal-card reveal-card--gold">
+        <div class="reveal-header">
+          <span class="reveal-dot reveal-dot--gold"></span>
+          <span class="reveal-label">Strategic plans</span>
+        </div>
+        <ul class="op-plans" id="op-plans"></ul>
+      </div>
+
+      <!-- Move tape -->
+      <div class="move-history">
+        <div class="mh-header">
+          <span class="mh-dot"></span>
+          <span class="mh-label">Variation</span>
+        </div>
+        <div class="mh-list" id="op-move-tape"></div>
+      </div>
+
+      <!-- Opening directory -->
+      <div class="op-directory">
+        <div class="reveal-header">
+          <span class="reveal-dot"></span>
+          <span class="reveal-label">All openings</span>
+        </div>
+        <div class="op-list" id="op-list"></div>
+      </div>
+
+    </aside>
+
+  </div>
+
+</div><!-- /#screen-openings -->
 
 <script src="script.js"></script>
 </body>
