@@ -34,6 +34,21 @@
     </nav>
   </header>
 
+  <!-- Resume where you left off -->
+  <section class="resume-row hidden" id="resume-row">
+    <div class="resume-card">
+      <span class="resume-marker" aria-hidden="true">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8a6 6 0 1 0 1.2-3.6"/><path d="M2 3v3h3"/></svg>
+      </span>
+      <div class="resume-body">
+        <span class="resume-eyebrow">Resume where you left off</span>
+        <span class="resume-detail" id="resume-detail">—</span>
+      </div>
+      <button class="resume-cta" id="resume-cta">Continue <span aria-hidden="true">→</span></button>
+      <button class="resume-dismiss" id="resume-dismiss" aria-label="Dismiss">×</button>
+    </div>
+  </section>
+
   <main class="academy-main">
 
     <section class="hero-pane">
@@ -46,10 +61,10 @@
       <div class="hero-actions">
         <button id="btn-mode-puzzles" class="btn-primary">
           <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M5 3l8 5-8 5V3z"/></svg>
-          Begin tactical training
+          Start Puzzle Training
         </button>
         <button id="btn-mode-openings" class="btn-ghost">
-          Browse opening repertoire
+          Study Openings
           <svg width="12" height="12" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
         </button>
       </div>
@@ -136,6 +151,16 @@
       <div class="board-wrap">
         <div class="board-ranks" id="rank-labels" aria-hidden="true"></div>
         <div id="board" class="chessboard" role="grid" aria-label="Chess board"></div>
+
+        <!-- Solved celebration overlay -->
+        <div class="solved-banner hidden" id="solved-banner" aria-hidden="true">
+          <div class="sb-ring"></div>
+          <div class="sb-icon">✓</div>
+          <div class="sb-text">
+            <div class="sb-title">Solved</div>
+            <div class="sb-sub" id="sb-sub"></div>
+          </div>
+        </div>
       </div>
       <div class="board-files-row">
         <div class="board-files-offset" aria-hidden="true"></div>
