@@ -391,6 +391,13 @@ const PIECE_URL = {
 const PIECE_VALUE = { p: 1, n: 3, b: 3, r: 5, q: 9, k: 0 };
 const PIECE_NAME  = { p: 'pawn', n: 'knight', b: 'bishop', r: 'rook', q: 'queen', k: 'king' };
 
+/* Unicode fallback glyphs — used if the Wikimedia SVG fails to load
+   (offline, blocked CDN, slow connection). Guarantees pieces always show. */
+const GLYPHS = {
+  wK:'♔', wQ:'♕', wR:'♖', wB:'♗', wN:'♘', wP:'♙',
+  bK:'♚', bQ:'♛', bR:'♜', bB:'♝', bN:'♞', bP:'♟'
+};
+
 
 /* ══════════════════════════════════════════════════════════
    CHESS ENGINE — minimax + alpha-beta + simple PSTs
@@ -629,7 +636,17 @@ function loadProg() {
   } catch { return newProg(); }
 }
 function newProg() {
-  return { solvedIds:[], attempts:0, streak:0, bestStreak:0, hintSolves:0, studiedOpenings:[], soundOn:true };
+  return {
+    solvedIds: [], attempts: 0, streak: 0, bestStreak: 0,
+    hintSolves: 0, studiedOpenings: [], soundOn: true,
+    lastSession: null,    // { screen, puzzleIdx?, openingIdx?, openingMode?, ts }
+    resumeDismissed: false
+  };
+}
+function saveLastSession(extra) {
+  prog.lastSession = Object.assign({ ts: Date.now() }, extra);
+  prog.resumeDismissed = false;
+  saveProg();
 }
 let prog = loadProg();
 function saveProg() { try { localStorage.setItem(LS_KEY, JSON.stringify(prog)); } catch {} }
@@ -663,6 +680,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   buildThemePills();
   updateHomeStats();
+  renderResumeBanner();
   $('fc-puzzle-count').textContent = `${PUZZLES.length} studies`;
   $('fc-opening-count').textContent = `${OPENINGS.length} openings`;
 
@@ -758,16 +776,35 @@ function showScreen(id) {
 function goHome() {
   if (O.autoTimer) { clearTimeout(O.autoTimer); O.autoTimer = null; }
   updateHomeStats();
+  renderResumeBanner();
   showScreen('screen-home');
 }
-function startTraining(idx) { loadPuzzle(idx); showScreen('screen-training'); }
+function startTraining(idx) {
+  loadPuzzle(idx);
+  saveLastSession({ screen: 'training', puzzleIdx: idx });
+  showScreen('screen-training');
+}
 function startRandom() {
   const idx = Math.floor(Math.random() * PUZZLES.length);
-  loadPuzzle(idx); showScreen('screen-training');
+  loadPuzzle(idx);
+  saveLastSession({ screen: 'training', puzzleIdx: idx });
+  showScreen('screen-training');
 }
-function startOpenings(idx) { loadOpening(idx || 0); showScreen('screen-openings'); }
-function navigate(dir) { loadPuzzle((S.idx + dir + PUZZLES.length) % PUZZLES.length); }
-function navigateOpening(dir) { loadOpening((O.idx + dir + OPENINGS.length) % OPENINGS.length); }
+function startOpenings(idx) {
+  loadOpening(idx || 0);
+  saveLastSession({ screen: 'openings', openingIdx: idx || 0, openingMode: O.mode });
+  showScreen('screen-openings');
+}
+function navigate(dir) {
+  const idx = (S.idx + dir + PUZZLES.length) % PUZZLES.length;
+  loadPuzzle(idx);
+  saveLastSession({ screen: 'training', puzzleIdx: idx });
+}
+function navigateOpening(dir) {
+  const idx = (O.idx + dir + OPENINGS.length) % OPENINGS.length;
+  loadOpening(idx);
+  saveLastSession({ screen: 'openings', openingIdx: idx, openingMode: O.mode });
+}
 function flipBoard() { S.flipped = !S.flipped; renderBoard(); }
 
 
@@ -813,6 +850,42 @@ function updateHomeStats() {
   $('stat-acc').textContent      = acc != null ? acc + '%' : '—';
   $('stat-openings').textContent = (prog.studiedOpenings || []).length;
   $('stat-streak').textContent   = prog.bestStreak || 0;
+}
+
+/* ──────────────────────────────────────────────────────────
+   RESUME BANNER
+───────────────────────────────────────────────────────────── */
+function renderResumeBanner() {
+  const row = $('resume-row');
+  if (!row) return;
+  const ls = prog.lastSession;
+  if (!ls || prog.resumeDismissed) { row.classList.add('hidden'); return; }
+
+  let detail = '', resumeAction = null;
+  if (ls.screen === 'training' && ls.puzzleIdx != null && PUZZLES[ls.puzzleIdx]) {
+    const p = PUZZLES[ls.puzzleIdx];
+    detail = `Tactics · Puzzle ${ls.puzzleIdx + 1} of ${PUZZLES.length} · ${p.theme}`;
+    resumeAction = () => startTraining(ls.puzzleIdx);
+  } else if (ls.screen === 'openings' && ls.openingIdx != null && OPENINGS[ls.openingIdx]) {
+    const op = OPENINGS[ls.openingIdx];
+    const modeMap = { study: 'Studying', practice: 'Practicing', play: 'Playing' };
+    const modeLabel = modeMap[ls.openingMode] || 'Studying';
+    detail = `Openings · ${modeLabel} ${op.name}`;
+    resumeAction = () => {
+      O.mode = ls.openingMode || 'study';
+      startOpenings(ls.openingIdx);
+    };
+  }
+
+  if (!resumeAction) { row.classList.add('hidden'); return; }
+  $('resume-detail').textContent = detail;
+  $('resume-cta').onclick = resumeAction;
+  $('resume-dismiss').onclick = () => {
+    prog.resumeDismissed = true;
+    saveProg();
+    row.classList.add('hidden');
+  };
+  row.classList.remove('hidden');
 }
 
 
@@ -912,11 +985,21 @@ function renderBoardInto(boardEl, game, opts) {
 
       if (pieceData) {
         const key  = pieceData.color + pieceData.type.toUpperCase();
-        const span = document.createElement('span');
-        span.className = `piece piece-${key}`;
-        span.style.backgroundImage = `url("${PIECE_URL[key]}")`;
-        span.setAttribute('aria-hidden', 'true');
-        div.appendChild(span);
+        const img  = document.createElement('img');
+        img.className = `piece piece-${key}`;
+        img.src       = PIECE_URL[key];
+        img.alt       = '';
+        img.draggable = false;
+        img.setAttribute('aria-hidden', 'true');
+        // Fallback to Unicode glyph if the SVG fails to load.
+        img.onerror = () => {
+          const span = document.createElement('span');
+          span.className = `piece piece-fallback piece-${pieceData.color}`;
+          span.textContent = GLYPHS[key];
+          span.setAttribute('aria-hidden', 'true');
+          img.replaceWith(span);
+        };
+        div.appendChild(img);
       }
 
       if (onClick) div.addEventListener('click', () => onClick(sqName));
@@ -1099,6 +1182,8 @@ function onSolved() {
   $('board').classList.add('solved');
   setTimeout(() => $('board').classList.remove('solved'), 800);
   SFX.win();
+  // Brief celebratory banner over the board.
+  showSolvedBanner(p.theme + ' · ' + (S.moveLog[S.moveLog.length - 1] || ''));
   const msgs = ['🎉 Excellent! You found the winning move!', '⭐ Perfect! That\'s exactly the right idea.', '✨ Brilliant! Spot-on tactical vision.', '🏆 Outstanding — just like the masters!'];
   setFeedback('fc-correct', '✓', msgs[Math.floor(Math.random() * msgs.length)]);
   $('panel-instruction').textContent = 'Puzzle solved!';
@@ -1154,6 +1239,30 @@ function setFeedback(stateClass, icon, msg) {
   if (stateClass) card.classList.add(stateClass);
   $('fb-icon').textContent = icon;
   $('fb-msg').textContent  = msg;
+  // Brief flash so a status change is noticed even with similar copy.
+  card.classList.remove('fb-flash');
+  void card.offsetWidth;
+  card.classList.add('fb-flash');
+}
+
+/* ──────────────────────────────────────────────────────────
+   SOLVED BANNER (smooth success animation)
+───────────────────────────────────────────────────────────── */
+function showSolvedBanner(detail) {
+  const b = $('solved-banner');
+  if (!b) return;
+  $('sb-sub').textContent = detail || '';
+  b.classList.remove('hidden', 'fading');
+  // Restart animation
+  b.style.animation = 'none';
+  void b.offsetWidth;
+  b.style.animation = '';
+  clearTimeout(b._tHide);
+  b._tHide = setTimeout(() => {
+    b.classList.add('fading');
+    clearTimeout(b._tHide2);
+    b._tHide2 = setTimeout(() => b.classList.add('hidden'), 380);
+  }, 1500);
 }
 
 
@@ -1275,6 +1384,8 @@ function setOpMode(mode, force) {
   if (!force && O.mode === mode) return;
   if (O.autoTimer) { clearTimeout(O.autoTimer); O.autoTimer = null; }
   O.mode = mode;
+  // Track mode change for the resume banner.
+  saveLastSession({ screen: 'openings', openingIdx: O.idx, openingMode: mode });
   // Tab buttons
   document.querySelectorAll('.op-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
   // Panes
