@@ -188,6 +188,27 @@
 
       <h2 class="panel-prompt" id="panel-instruction">Find the best move.</h2>
 
+      <!-- Lesson card (shown before the user makes a move) -->
+      <div class="lesson-card" id="lesson-card">
+        <button class="lesson-toggle" id="lesson-toggle" aria-expanded="true">
+          <span class="lesson-mark" aria-hidden="true">📖</span>
+          <span class="lesson-title" id="lesson-title">Lesson</span>
+          <span class="lesson-caret" aria-hidden="true">▾</span>
+        </button>
+        <div class="lesson-body" id="lesson-body">
+          <p class="lesson-intro" id="lesson-intro"></p>
+          <p class="lesson-pattern" id="lesson-pattern"></p>
+          <div class="lesson-check-header">What to look for</div>
+          <ul class="lesson-checklist" id="lesson-checklist"></ul>
+        </div>
+      </div>
+
+      <!-- Real-game badge -->
+      <div class="realgame-line" id="realgame-line" hidden>
+        <span class="rg-icon" aria-hidden="true">♛</span>
+        <span class="rg-text" id="rg-text"></span>
+      </div>
+
       <div class="feedback-card" id="feedback-card" role="status" aria-live="polite">
         <span class="fb-icon" id="fb-icon" aria-hidden="true"></span>
         <span class="fb-text" id="fb-msg">Select a piece to begin.</span>
@@ -336,6 +357,18 @@
           <div class="mh-header"><span class="mh-dot"></span><span class="mh-label">Variation</span></div>
           <div class="mh-list" id="op-move-tape"></div>
         </div>
+
+        <!-- Database Insight (Lichess Opening Explorer) -->
+        <div class="db-insight" id="db-insight-study">
+          <div class="reveal-header">
+            <span class="reveal-dot reveal-dot--teal"></span>
+            <span class="reveal-label">Database Insight · lichess.org</span>
+            <span class="db-state" id="db-state-study"></span>
+          </div>
+          <div class="db-body" id="db-body-study">
+            <span class="db-hint">Step forward to see how often master-level players continue with this opening.</span>
+          </div>
+        </div>
       </div>
 
       <!-- PRACTICE pane -->
@@ -374,14 +407,54 @@
           <p class="reveal-body" id="play-prompt">After the opening moves are played, continue the game against the built-in engine. Each of your moves is rated and explained.</p>
         </div>
 
+        <!-- Engine difficulty selector -->
+        <div class="diff-row">
+          <span class="diff-label">Engine</span>
+          <div class="diff-group" id="diff-group" role="tablist">
+            <button class="diff-btn"        data-diff="easy"   role="tab">Easy</button>
+            <button class="diff-btn active"  data-diff="medium" role="tab">Medium</button>
+            <button class="diff-btn"        data-diff="hard"   role="tab">Hard</button>
+          </div>
+        </div>
+
         <div class="feedback-card" id="play-feedback">
           <span class="fb-icon" id="play-fb-icon">⚔</span>
           <span class="fb-text" id="play-fb-msg">Make a move to start.</span>
         </div>
 
+        <!-- 4-part structured "Why?" card -->
         <div class="why-card hidden" id="why-card">
-          <div class="reveal-header"><span class="reveal-dot reveal-dot--gold"></span><span class="reveal-label">Engine analysis</span></div>
-          <p class="reveal-body" id="why-body"></p>
+          <div class="reveal-header"><span class="reveal-dot reveal-dot--gold"></span><span class="reveal-label">Coach's analysis</span></div>
+          <div class="why-grid">
+            <div class="why-row">
+              <span class="why-label">You played</span>
+              <span class="why-value"><span class="san-tag" id="why-user-san">—</span> <span class="why-cat" id="why-user-cat"></span></span>
+            </div>
+            <div class="why-row">
+              <span class="why-label">Engine prefers</span>
+              <span class="why-value"><span class="san-tag san-best" id="why-best-san">—</span></span>
+            </div>
+            <div class="why-row why-row--block">
+              <span class="why-label">Why it's better</span>
+              <p class="why-text" id="why-reason"></p>
+            </div>
+            <div class="why-row why-row--block why-row--lesson">
+              <span class="why-label">Remember</span>
+              <p class="why-text" id="why-lesson"></p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Database Insight (Lichess Opening Explorer) -->
+        <div class="db-insight" id="db-insight-play">
+          <div class="reveal-header">
+            <span class="reveal-dot reveal-dot--teal"></span>
+            <span class="reveal-label">Database Insight · lichess.org</span>
+            <span class="db-state" id="db-state-play"></span>
+          </div>
+          <div class="db-body" id="db-body-play">
+            <span class="db-hint">Make a move — the live database will show how strong real players continue from each position.</span>
+          </div>
         </div>
 
         <div class="move-history">
@@ -389,7 +462,7 @@
           <div class="mh-list" id="play-tape"><span class="mh-empty">No moves yet.</span></div>
         </div>
 
-        <p class="muted-note">The engine plays at study strength (depth 2) so you can focus on ideas. Use <b>Why?</b> after a move to see what the engine recommends and why.</p>
+        <p class="muted-note">Engine difficulty changes the search depth. Use <b>Why?</b> after any move to see what the engine prefers and why.</p>
       </div>
 
       <!-- Opening directory (shared) -->
@@ -400,6 +473,45 @@
 
     </aside>
 
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     POST-GAME REPORT MODAL
+════════════════════════════════════════════════ -->
+<div id="post-report" class="post-report hidden" aria-hidden="true">
+  <div class="pr-backdrop" id="pr-backdrop"></div>
+  <div class="pr-card" role="dialog" aria-modal="true" aria-labelledby="pr-title">
+    <div class="pr-head">
+      <span class="pr-eyebrow">Game complete</span>
+      <h2 class="pr-title" id="pr-title">Post-game Report</h2>
+    </div>
+
+    <div class="pr-score-row">
+      <div class="pr-score">
+        <span class="pr-acc-value" id="pr-acc-value">—</span>
+        <span class="pr-acc-key">Accuracy</span>
+      </div>
+      <div class="pr-result" id="pr-result">Game over</div>
+    </div>
+
+    <div class="pr-stats">
+      <div class="pr-stat pr-stat--best"><span class="pr-num" id="pr-best">0</span><span class="pr-key">Best</span></div>
+      <div class="pr-stat pr-stat--good"><span class="pr-num" id="pr-good">0</span><span class="pr-key">Good</span></div>
+      <div class="pr-stat pr-stat--inac"><span class="pr-num" id="pr-inac">0</span><span class="pr-key">Inaccuracies</span></div>
+      <div class="pr-stat pr-stat--mist"><span class="pr-num" id="pr-mist">0</span><span class="pr-key">Mistakes</span></div>
+      <div class="pr-stat pr-stat--blun"><span class="pr-num" id="pr-blun">0</span><span class="pr-key">Blunders</span></div>
+    </div>
+
+    <div class="pr-turning" id="pr-turning-wrap" hidden>
+      <span class="pr-section-label">Biggest turning point</span>
+      <div class="pr-turning-detail" id="pr-turning-detail"></div>
+    </div>
+
+    <div class="pr-actions">
+      <button id="pr-again"   class="btn-primary">Play again</button>
+      <button id="pr-close"   class="btn-ghost">Close</button>
+    </div>
   </div>
 </div>
 

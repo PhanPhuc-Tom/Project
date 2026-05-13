@@ -398,6 +398,161 @@ const GLYPHS = {
   bK:'♚', bQ:'♛', bR:'♜', bB:'♝', bN:'♞', bP:'♟'
 };
 
+/* ──────────────────────────────────────────────────────────
+   TACTIC LESSONS  — short pre-puzzle teaching cards
+   Keyed by the puzzle's `theme` field.
+───────────────────────────────────────────────────────────── */
+const LESSONS = {
+  'Back-Rank Mate': {
+    intro: "A back-rank mate happens when a king is trapped on its first or last rank — usually by its own pawns — and a rook or queen delivers checkmate along that rank.",
+    pattern: "Classic pattern: rook slides to the 8th rank while the enemy king is hemmed in by f7, g7, h7 pawns.",
+    checklist: [
+      "Is the enemy king sitting on the back rank with no escape square?",
+      "Are the king's own pawns blocking it (no luft)?",
+      "Can your rook or queen reach the back rank with check?",
+      "Is the checking piece supported, or is the back rank otherwise undefended?"
+    ]
+  },
+  'Knight Fork': {
+    intro: "A knight fork attacks two pieces at once. Because knights jump, no enemy piece can interpose — your opponent must let one piece go.",
+    pattern: "Royal fork: a knight lands on a square that attacks both the king (forcing it to move) and the queen behind it.",
+    checklist: [
+      "Find squares the knight can reach in one move.",
+      "Check whether any of those squares attacks two valuable enemy pieces.",
+      "Prefer squares that include the king — a check forces the response.",
+      "Confirm the landing square isn't defended (or, if it is, the trade is favourable)."
+    ]
+  },
+  'Rook Checkmate': {
+    intro: "A rook + king vs. lone king is a fundamental endgame win. The rook drives the enemy king to the edge; your king covers the escape squares.",
+    pattern: "Drive the enemy king to the edge with rook checks, bring your king up to oppose it, then deliver the final check on the back rank from a distance.",
+    checklist: [
+      "Is the enemy king on the edge of the board?",
+      "Is your king two squares away in opposition?",
+      "Is the rook poised to give check on the back rank?",
+      "Is the rook far enough that it can't be captured?"
+    ]
+  },
+  'Discovered Attack': {
+    intro: "Discovered attacks happen when moving one piece uncovers another piece's attack. Two threats are created with one move — your opponent can address only one.",
+    pattern: "A bishop in front of a rook moves away with check or capture; the rook now attacks a piece on the open file.",
+    checklist: [
+      "Which of your pieces is blocking another?",
+      "Where can the blocker move to create its own threat (capture, check, fork)?",
+      "Will the uncovered piece attack something valuable?",
+      "Is the moving piece itself safe on its new square?"
+    ]
+  },
+  'Queen Fork': {
+    intro: "The queen is the strongest forking piece because she attacks along rank, file, and diagonal at the same time.",
+    pattern: "Place the queen so she attacks two undefended pieces simultaneously — one along a rank/file, another along a diagonal.",
+    checklist: [
+      "Scan for undefended enemy pieces.",
+      "Find a queen square that hits two of them at once.",
+      "Confirm the queen will be safe on the forking square.",
+      "Prefer forks that include a check — they force the response."
+    ]
+  },
+  'Pin': {
+    intro: "A pinned piece cannot legally move, because doing so would expose a more valuable piece behind it (usually the king).",
+    pattern: "A bishop or rook lines up: attacker → pinned piece → enemy king (or queen). Pile attackers on the pinned piece to win it.",
+    checklist: [
+      "Are any enemy pieces in front of a more valuable piece on the same line?",
+      "Can you attack the pinned piece with a less valuable attacker?",
+      "Will the pinned piece stay pinned after your move?",
+      "Does the opponent have a way to break the pin (interpose, trade)?"
+    ]
+  },
+  'Skewer': {
+    intro: "A skewer is the reverse of a pin: a valuable piece is attacked first and forced to move, revealing a weaker piece behind it.",
+    pattern: "Check the enemy king along a rank or diagonal; when the king moves, capture the rook or queen that was hiding behind it.",
+    checklist: [
+      "Is the enemy king lined up with a less valuable piece on the same rank, file, or diagonal?",
+      "Can you give check from beyond that piece?",
+      "Will the king be forced to move (not block or capture)?",
+      "Is your skewering piece safe after the capture?"
+    ]
+  },
+  'Smothered Mate': {
+    intro: "Smothered mate happens when a king is surrounded by its own pieces and a knight delivers an unstoppable check — only knights can deliver mate to a fully-blocked king.",
+    pattern: "Knight jumps next to a king walled in by its own rook and pawns; no piece can capture or block the knight.",
+    checklist: [
+      "Is the enemy king blocked on every flight square by its own pieces?",
+      "Can your knight reach a square that gives check?",
+      "Is the knight defended, or unreachable by any defender?",
+      "Are sacrifices needed to trap the king in the corner first?"
+    ]
+  },
+  'Hanging Piece': {
+    intro: "A 'hanging' piece is one that has no defender. Capturing it wins material for free. Before any move, scan the whole board for hanging pieces — yours and the opponent's.",
+    pattern: "Enemy queen sits on an open square with no defender. Take it with any piece.",
+    checklist: [
+      "List every enemy piece — is each one defended?",
+      "List every one of your pieces — is each one defended (or unattacked)?",
+      "If an enemy piece is undefended, can any of your pieces capture it?",
+      "After the capture, is your capturing piece itself safe?"
+    ]
+  },
+  'Queen & Rook': {
+    intro: "Queen + rook is chess's most powerful attacking duo. The rook supports the queen so she can land next to the enemy king without being captured.",
+    pattern: "Rook controls the open file; queen lands on the square next to the king, defended by the rook. The king cannot escape or capture.",
+    checklist: [
+      "Is there an open file or rank pointing at the enemy king?",
+      "Can the queen land adjacent to the king on that line?",
+      "Is the queen defended by the rook (or another piece)?",
+      "Are all the king's escape squares covered?"
+    ]
+  },
+  'King & Queen Mate': {
+    intro: "Queen + king vs. lone king is the most fundamental checkmate. Use the queen to cut off the king, then bring your king up to deliver mate.",
+    pattern: "Queen takes away every square except one diagonal escape; the king walks up to cover it.",
+    checklist: [
+      "Push the enemy king to the edge with queen moves a knight's distance away.",
+      "Bring your own king close to cover the queen and block escape squares.",
+      "Avoid stalemate — leave the enemy king one legal square until mate.",
+      "Deliver mate with the queen supported by your king."
+    ]
+  },
+  'Pawn Fork': {
+    intro: "Even the humblest pawn can fork two pieces. A pawn push attacks both diagonally forward squares at once.",
+    pattern: "Pawn advances one square, attacking the knight on its left-forward and the bishop on its right-forward.",
+    checklist: [
+      "Look at every pawn — what would it attack if pushed one square?",
+      "Are there two enemy pieces on the diagonals it would reach?",
+      "Is the pawn move safe (not losing the pawn to a counter-capture)?",
+      "Prefer pawn forks that gain a piece for a pawn."
+    ]
+  },
+  'Promotion Mate': {
+    intro: "Pawn promotion that delivers immediate checkmate is the ultimate efficiency — one move creates a new queen AND wins the game.",
+    pattern: "Pawn pushes to the 8th rank, becomes a queen, and immediately attacks the enemy king with no escape — usually defended by your king.",
+    checklist: [
+      "Is your pawn one move from the 8th (or 1st) rank?",
+      "Does the new queen attack the enemy king?",
+      "Is the new queen defended (so the king can't simply take it)?",
+      "Are all the king's escape squares covered?"
+    ]
+  }
+};
+
+/* Real-game labels: short attribution shown above the prompt, beyond the
+   detailed master examples that appear after solving. */
+const PUZZLE_REAL_GAME = {
+  1:  { who: 'Morphy "Opera Game"',            year: 1858 },
+  2:  { who: 'Bobby Fischer pattern',          year: 1972 },
+  3:  { who: 'Foundational endgame technique', year: null },
+  4:  { who: 'Tal-style discovery',            year: 1960 },
+  5:  { who: 'Steinitz queen pattern',         year: 1880 },
+  6:  { who: 'Capablanca-style pin & win',     year: 1921 },
+  7:  { who: 'Karpov endgame skewer',          year: 1978 },
+  8:  { who: "Philidor's Legacy",              year: 1749 },
+  9:  { who: 'Carlsen punishment pattern',     year: 2013 },
+  10: { who: 'Morphy attacking duo',           year: 1859 },
+  11: { who: 'Endgame fundamentals',           year: null },
+  12: { who: 'Botvinnik pawn break',           year: 1948 },
+  13: { who: 'Classical endgame study',        year: null }
+};
+
 
 /* ══════════════════════════════════════════════════════════
    CHESS ENGINE — minimax + alpha-beta + simple PSTs
@@ -533,11 +688,11 @@ const ENGINE = {
     return scored;
   },
 
-  bestMove(game, depth = 2) {
+  bestMove(game, depth = 2, randomness = 15) {
     const scored = this.scoreAllMoves(game, depth);
     if (!scored.length) return null;
-    // Tiebreak: pick randomly among the top moves within 15cp to avoid robotic play.
-    const top = scored.filter(s => s.moverScore >= scored[0].moverScore - 15);
+    // Tiebreak: pick randomly among the top moves within `randomness` cp.
+    const top = scored.filter(s => s.moverScore >= scored[0].moverScore - randomness);
     return top[Math.floor(Math.random() * top.length)];
   },
 
@@ -595,6 +750,61 @@ const SFX = {
 
 
 /* ══════════════════════════════════════════════════════════
+   API — Lichess Opening Explorer (free, no auth, CORS-enabled)
+   Used as an OPTIONAL bonus layer. If the API fails, the app
+   falls back to the built-in engine + curated content.
+══════════════════════════════════════════════════════════ */
+const API = {
+  enabled: true,                    // can be disabled at runtime
+  cache: new Map(),                 // FEN → response (in-memory only)
+  inflight: new Map(),              // FEN → pending Promise (dedupe)
+
+  buildUrl(fen, mode) {
+    const enc = encodeURIComponent(fen);
+    if (mode === 'masters') {
+      return `https://explorer.lichess.ovh/masters?fen=${enc}&moves=8&topGames=0`;
+    }
+    // Default: lichess DB across higher ratings + standard time controls
+    return `https://explorer.lichess.ovh/lichess?fen=${enc}` +
+           `&moves=8&topGames=0&recentGames=0` +
+           `&speeds=blitz,rapid,classical&ratings=2000,2200,2500`;
+  },
+
+  async fetchExplorer(fen) {
+    if (!this.enabled || !fen) return null;
+    if (this.cache.has(fen))    return this.cache.get(fen);
+    if (this.inflight.has(fen)) return this.inflight.get(fen);
+
+    const run = (async () => {
+      // Try masters first (high-quality games), then fall back to lichess DB.
+      for (const mode of ['masters', 'lichess']) {
+        try {
+          const ctrl = new AbortController();
+          const t = setTimeout(() => ctrl.abort(), 5000);
+          const resp = await fetch(this.buildUrl(fen, mode), { signal: ctrl.signal });
+          clearTimeout(t);
+          if (!resp.ok) continue;
+          const data = await resp.json();
+          if (data && data.moves && data.moves.length) {
+            const result = { mode, data };
+            this.cache.set(fen, result);
+            return result;
+          }
+        } catch (_) { /* network/timeout — try next mode */ }
+      }
+      // Cache the null result too so we don't keep retrying.
+      this.cache.set(fen, null);
+      return null;
+    })();
+
+    this.inflight.set(fen, run);
+    try { return await run; }
+    finally { this.inflight.delete(fen); }
+  }
+};
+
+
+/* ══════════════════════════════════════════════════════════
    APP STATE
 ══════════════════════════════════════════════════════════ */
 const S = {
@@ -622,6 +832,13 @@ const O = {
   playLog: [], playLastUser: null, playLastBest: null,
   playThinking: false, playPly: 0, playFlipped: false,
   playLastFrom: null, playLastTo: null,
+
+  // Engine difficulty
+  engineDepth: 2, engineRandom: 15, engineDifficulty: 'medium',
+
+  // Per-game stats (for post-game report)
+  playStats: null,            // { best, good, inaccuracy, mistake, blunder, history: [], userColor }
+  playReportShown: false,
 };
 
 
@@ -725,6 +942,17 @@ document.addEventListener('DOMContentLoaded', () => {
   $('btn-play-takeback').addEventListener('click', playTakeBack);
   $('btn-play-restart').addEventListener('click', () => enterPlay());
   $('btn-play-flip').addEventListener('click', () => { O.playFlipped = !O.playFlipped; renderPlayBoard(); });
+
+  // Engine difficulty buttons
+  document.querySelectorAll('#diff-group .diff-btn').forEach(b => {
+    b.addEventListener('click', () => setEngineDifficulty(b.dataset.diff));
+  });
+  applyEngineDifficulty(O.engineDifficulty);
+
+  // Post-game report buttons
+  $('pr-again').addEventListener('click', () => { hidePostReport(); enterPlay(); });
+  $('pr-close').addEventListener('click', hidePostReport);
+  $('pr-backdrop').addEventListener('click', hidePostReport);
 
   // Keyboard
   document.addEventListener('keydown', onKey);
@@ -918,6 +1146,8 @@ function loadPuzzle(idx) {
 
   S.flipped = p.fen.includes(' b ');
   renderBoard(); renderMoveList(); renderCaptures(); updateProgress();
+  renderLessonForPuzzle(idx);
+  wireLessonToggle();
   const panel = document.querySelector('#screen-training .panel-col');
   if (panel) panel.scrollTop = 0;
 }
@@ -1399,9 +1629,12 @@ function setOpMode(mode, force) {
   // Eval bar — visible only in play mode
   $('eval-bar').classList.toggle('hidden', mode !== 'play');
 
-  if (mode === 'study') { renderOpBoard(); renderOpTape(); updateOpMoveLabel(); }
+  if (mode === 'study') {
+    renderOpBoard(); renderOpTape(); updateOpMoveLabel();
+    renderDbInsight(O.game.fen(), 'db-body-study', 'db-state-study');
+  }
   else if (mode === 'practice') { practiceReset(); }
-  else if (mode === 'play') { enterPlay(); }
+  else if (mode === 'play')     { enterPlay(); }
 }
 
 
@@ -1472,11 +1705,13 @@ function opStep(dir) {
     SFX.move();
   }
   renderOpBoard(); renderOpTape(); updateOpMoveLabel();
+  renderDbInsight(O.game.fen(), 'db-body-study', 'db-state-study');
 }
 function opFirst() {
   if (O.autoTimer) { clearTimeout(O.autoTimer); O.autoTimer = null; updateAutoBtn(false); }
   O.game = new Chess(); O.ply = 0; O.lastFrom = O.lastTo = null;
   renderOpBoard(); renderOpTape(); updateOpMoveLabel();
+  renderDbInsight(O.game.fen(), 'db-body-study', 'db-state-study');
 }
 function opGoToPly(targetPly) {
   if (O.autoTimer) { clearTimeout(O.autoTimer); O.autoTimer = null; updateAutoBtn(false); }
@@ -1493,6 +1728,7 @@ function opGoToPly(targetPly) {
   } else { O.lastFrom = O.lastTo = null; }
   if (O.ply === op.moves.length) markOpeningStudied(op.id);
   renderOpBoard(); renderOpTape(); updateOpMoveLabel();
+  renderDbInsight(O.game.fen(), 'db-body-study', 'db-state-study');
 }
 function opAutoPlay() {
   if (O.autoTimer) { clearTimeout(O.autoTimer); O.autoTimer = null; updateAutoBtn(false); return; }
@@ -1713,12 +1949,15 @@ function enterPlay() {
   O.playLog = op.moves.map(m => m.san);
   O.playLastUser = null; O.playLastBest = null;
   O.playLastFrom = null; O.playLastTo = null;
-  O.playPly = op.moves.length;
+  O.playPly = 0;                  // counts moves played *after* the opening
   O.playThinking = false;
   O.playFlipped = !!op.flipForBlack;
   $('why-card').classList.add('hidden');
+  initPlayStats();
+  hidePostReport();
   setPlayFeedback('', '⚔', `Position from the ${op.name}. ${op.userColor === O.playGame.turn() ? 'Your move.' : 'Engine will play first…'}`);
   renderPlayBoard(); renderPlayTape(); updateEvalBar();
+  renderDbInsight(O.playGame.fen(), 'db-body-play', 'db-state-play');
   // If it's the engine's move, kick it off.
   if (O.playGame.turn() !== op.userColor) setTimeout(engineMove, 450);
 }
@@ -1784,6 +2023,8 @@ function tryPlayMove(from, to) {
   O.playSelected = null; O.playTargets = [];
   O.playLastUser = { move: res, from, to, promotion, classification: cls };
   O.playLastBest = cls.best;
+  O.playPly++;
+  recordPlayMove(res.san, cls, O.playPly);
 
   if (O.playGame.in_check()) SFX.check();
   else if (res.captured) SFX.capture(); else SFX.move();
@@ -1808,6 +2049,8 @@ function tryPlayMove(from, to) {
     `${res.san} — ${label}${lossPart}. ${cls.category !== 'best' ? 'Tap "Why?" to see the engine\'s preferred move.' : 'The engine agrees.'}`);
   $('why-card').classList.add('hidden');
   renderPlayBoard(); renderPlayTape(); updateEvalBar();
+  // Async DB insight refresh (engine + UI continue immediately).
+  renderDbInsight(O.playGame.fen(), 'db-body-play', 'db-state-play');
 
   if (O.playGame.game_over()) { handlePlayGameOver(); return; }
 
@@ -1819,7 +2062,7 @@ function engineMove() {
   if (!O.playGame || O.playGame.game_over()) return;
   const op = OPENINGS[O.idx];
   if (O.playGame.turn() === op.userColor) { O.playThinking = false; return; }
-  const best = ENGINE.bestMove(O.playGame, 2);
+  const best = ENGINE.bestMove(O.playGame, O.engineDepth, O.engineRandom);
   if (!best) { O.playThinking = false; return; }
   const res = O.playGame.move(best.move);
   if (!res) { O.playThinking = false; return; }
@@ -1828,22 +2071,27 @@ function engineMove() {
   if (O.playGame.in_check()) SFX.check();
   else if (res.captured) SFX.capture(); else SFX.move();
   O.playThinking = false;
+  O.playPly++;
   renderPlayBoard(); renderPlayTape(); updateEvalBar();
+  renderDbInsight(O.playGame.fen(), 'db-body-play', 'db-state-play');
   if (O.playGame.game_over()) handlePlayGameOver();
   else setPlayFeedback('', '⚔', `Engine played ${res.san}. Your move.`);
 }
 function handlePlayGameOver() {
   let msg = 'Game over.';
+  let result = 'Game complete';
   if (O.playGame.in_checkmate()) {
     const winnerWhite = O.playGame.turn() === 'b'; // side to move just got mated
     const op = OPENINGS[O.idx];
     const userWon = (winnerWhite ? 'w' : 'b') === op.userColor;
-    msg = userWon ? '🏆 Checkmate — you won!' : '✗ Checkmate — the engine won this round.';
-  } else if (O.playGame.in_draw()) msg = 'Draw.';
-  else if (O.playGame.in_stalemate()) msg = 'Stalemate — draw.';
-  else if (O.playGame.insufficient_material()) msg = 'Insufficient material — draw.';
-  else if (O.playGame.in_threefold_repetition()) msg = 'Threefold repetition — draw.';
+    msg    = userWon ? '🏆 Checkmate — you won!' : '✗ Checkmate — the engine won this round.';
+    result = userWon ? 'Checkmate — You won' : 'Checkmate — Engine won';
+  } else if (O.playGame.in_draw())                  { msg = 'Draw.';                    result = 'Draw'; }
+  else if (O.playGame.in_stalemate())               { msg = 'Stalemate — draw.';        result = 'Stalemate — Draw'; }
+  else if (O.playGame.insufficient_material())      { msg = 'Insufficient material — draw.'; result = 'Insufficient material'; }
+  else if (O.playGame.in_threefold_repetition())    { msg = 'Threefold repetition — draw.';  result = 'Threefold repetition'; }
   setPlayFeedback(O.playGame.in_checkmate() ? 'fc-correct' : 'fc-info', '⚔', msg);
+  setTimeout(() => showPostReport(result), 600);
 }
 function playTakeBack() {
   if (O.playThinking) return;
@@ -1868,29 +2116,11 @@ function playTakeBack() {
   renderPlayBoard(); renderPlayTape(); updateEvalBar();
 }
 function onPlayWhy() {
-  const why = $('why-card');
   if (!O.playLastUser) {
     setPlayFeedback('fc-hint', '💡', 'Make a move first, then I can explain why the engine prefers a different move.');
     return;
   }
-  const last = O.playLastUser;
-  const best = O.playLastBest;
-  if (last.classification.category === 'best') {
-    $('why-body').innerHTML = `Your move <b>${last.move.san}</b> matches the engine's top choice. No improvement available.`;
-    why.classList.remove('hidden'); return;
-  }
-  // Build explanation
-  const bestSan = sanOf(best);
-  const beforeFen = (() => {
-    const c = new Chess(O.playGame.fen());
-    c.undo(); // undo engine reply if any
-    if (O.playGame.history().length > OPENINGS[O.idx].moves.length + 1) c.undo(); // undo user move
-    return c.fen();
-  })();
-
-  const explanation = explainEngineChoice(last.move, best, last.classification);
-  $('why-body').innerHTML = explanation;
-  why.classList.remove('hidden');
+  fillStructuredWhy(O.playLastUser.move, O.playLastUser.classification);
 }
 function setPlayFeedback(cls, icon, msg) {
   const card = $('play-feedback');
@@ -1976,4 +2206,266 @@ function prettifyUci(m) {
   const to   = m.to   || m.uci?.slice(2,4) || '';
   const prom = m.promotion || (m.uci && m.uci.length === 5 ? m.uci[4] : '');
   return from + '→' + to + (prom ? '=' + prom.toUpperCase() : '');
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   LESSON CARDS (shown before each puzzle)
+══════════════════════════════════════════════════════════ */
+function renderLessonForPuzzle(idx) {
+  const card = $('lesson-card');
+  if (!card) return;
+  const p = PUZZLES[idx];
+  const lesson = LESSONS[p.theme];
+  const titleEl = $('lesson-title');
+  const introEl = $('lesson-intro');
+  const patternEl = $('lesson-pattern');
+  const listEl = $('lesson-checklist');
+
+  if (!lesson) { card.classList.add('hidden'); return; }
+  card.classList.remove('hidden');
+  card.classList.remove('collapsed');
+  card.classList.add('lesson-open');
+  titleEl.textContent = `Lesson · ${p.theme}`;
+  introEl.textContent = lesson.intro;
+  patternEl.textContent = lesson.pattern;
+  listEl.innerHTML = lesson.checklist.map(c => `<li>${c}</li>`).join('');
+  $('lesson-toggle').setAttribute('aria-expanded', 'true');
+
+  // Real-game line
+  const rg = PUZZLE_REAL_GAME[p.id];
+  const rgLine = $('realgame-line');
+  if (rg) {
+    rgLine.hidden = false;
+    $('rg-text').textContent = `${rg.who}${rg.year ? ' · ' + rg.year : ''} · ${p.theme}`;
+  } else {
+    rgLine.hidden = true;
+  }
+}
+function wireLessonToggle() {
+  const btn = $('lesson-toggle');
+  if (!btn || btn._wired) return;
+  btn._wired = true;
+  btn.addEventListener('click', () => {
+    const card = $('lesson-card');
+    const isOpen = !card.classList.contains('collapsed');
+    card.classList.toggle('collapsed', isOpen);
+    btn.setAttribute('aria-expanded', String(!isOpen));
+  });
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   ENGINE DIFFICULTY
+══════════════════════════════════════════════════════════ */
+function setEngineDifficulty(diff) {
+  if (!['easy','medium','hard'].includes(diff)) return;
+  O.engineDifficulty = diff;
+  applyEngineDifficulty(diff);
+  // Reflect button state
+  document.querySelectorAll('#diff-group .diff-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.diff === diff));
+  // Brief feedback
+  setPlayFeedback('', '⚙', `Engine set to ${diff[0].toUpperCase() + diff.slice(1)}.`);
+}
+function applyEngineDifficulty(diff) {
+  if (diff === 'easy')   { O.engineDepth = 1; O.engineRandom = 120; }
+  else if (diff === 'hard') { O.engineDepth = 3; O.engineRandom = 0; }
+  else                   { O.engineDepth = 2; O.engineRandom = 15; }
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   POST-GAME REPORT
+══════════════════════════════════════════════════════════ */
+function initPlayStats() {
+  O.playStats = { best:0, good:0, inaccuracy:0, mistake:0, blunder:0, history:[], userColor: OPENINGS[O.idx].userColor };
+  O.playReportShown = false;
+}
+function recordPlayMove(san, cls, ply) {
+  if (!O.playStats) initPlayStats();
+  O.playStats[cls.category] = (O.playStats[cls.category] || 0) + 1;
+  O.playStats.history.push({ ply, san, category: cls.category, delta: cls.delta });
+}
+function computeAccuracy() {
+  if (!O.playStats) return null;
+  const s = O.playStats;
+  const total = s.best + s.good + s.inaccuracy + s.mistake + s.blunder;
+  if (!total) return null;
+  // Simple weighted accuracy — best=1.0, good=0.85, inaccuracy=0.60, mistake=0.35, blunder=0.10
+  const score = s.best*1.0 + s.good*0.85 + s.inaccuracy*0.6 + s.mistake*0.35 + s.blunder*0.10;
+  return Math.round((score / total) * 100);
+}
+function biggestTurningPoint() {
+  if (!O.playStats || !O.playStats.history.length) return null;
+  let worst = null;
+  for (const h of O.playStats.history) {
+    if (h.delta == null || !isFinite(h.delta)) continue;
+    if (!worst || h.delta > worst.delta) worst = h;
+  }
+  return worst && worst.delta >= 75 ? worst : null;
+}
+function showPostReport(result) {
+  if (O.playReportShown) return;
+  O.playReportShown = true;
+  const s = O.playStats;
+  $('pr-best').textContent = s ? s.best : 0;
+  $('pr-good').textContent = s ? s.good : 0;
+  $('pr-inac').textContent = s ? s.inaccuracy : 0;
+  $('pr-mist').textContent = s ? s.mistake : 0;
+  $('pr-blun').textContent = s ? s.blunder : 0;
+  const acc = computeAccuracy();
+  $('pr-acc-value').textContent = acc != null ? acc + '%' : '—';
+  $('pr-result').textContent = result || 'Game complete';
+
+  const turn = biggestTurningPoint();
+  const wrap = $('pr-turning-wrap');
+  if (turn) {
+    wrap.hidden = false;
+    // Translate the per-game ply into the actual chess move number, which
+    // includes the opening moves that came before play mode started.
+    const op = OPENINGS[O.idx];
+    const totalPly = (op ? op.moves.length : 0) + turn.ply;
+    const moveNum = Math.floor((totalPly + 1) / 2);
+    const side = totalPly % 2 === 1 ? '.' : '…';
+    const pawns = (turn.delta / 100).toFixed(2);
+    $('pr-turning-detail').textContent =
+      `Move ${moveNum}${side}${turn.san} — ${prettyCategory(turn.category)}, about ${pawns} pawns worse than the best move.`;
+  } else {
+    wrap.hidden = true;
+  }
+
+  const modal = $('post-report');
+  modal.classList.remove('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+}
+function hidePostReport() {
+  const modal = $('post-report');
+  modal.classList.add('hidden');
+  modal.setAttribute('aria-hidden', 'true');
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   STRUCTURED "WHY?" CARD
+══════════════════════════════════════════════════════════ */
+function fillStructuredWhy(userMv, cls) {
+  const card = $('why-card');
+  if (!card) return;
+  const userSan = userMv.san || (userMv.from + userMv.to);
+  const bestMv  = cls.best;
+  const bestSan = sanOf(bestMv);
+
+  $('why-user-san').textContent = userSan;
+  $('why-user-san').className   = 'san-tag san-' + cls.category;
+  $('why-user-cat').textContent = prettyCategory(cls.category);
+  $('why-best-san').textContent = bestSan;
+
+  // Reason
+  let reason = '';
+  if (cls.category === 'best') {
+    reason = `Your move matches the engine's top choice. No improvement available.`;
+  } else if (bestMv && bestMv.captured) {
+    reason = `${bestSan} captures the ${PIECE_NAME[bestMv.captured]} on ${bestMv.to}, winning material that your move overlooks.`;
+  } else if (bestMv && /#/.test(bestSan)) {
+    reason = `${bestSan} delivers checkmate immediately.`;
+  } else if (bestMv && /\+/.test(bestSan)) {
+    reason = `${bestSan} gives check, forcing the opponent's reply and seizing the initiative.`;
+  } else {
+    const pawns = (cls.delta / 100).toFixed(2);
+    reason = `${bestSan} keeps the position about ${pawns} pawns better than your move — usually because it improves activity, defends a target, or creates a stronger threat.`;
+  }
+  $('why-reason').textContent = reason;
+
+  // Lesson
+  let lesson;
+  switch (cls.category) {
+    case 'best':
+      lesson = 'Trust your calculation — you found the move a strong engine agrees with.';
+      break;
+    case 'good':
+      lesson = 'Close to best. Before each move, double-check whether a forcing move (check, capture, threat) does even more.';
+      break;
+    case 'inaccuracy':
+      lesson = 'Always ask: "What is my opponent threatening?" and "Does my move have a more forcing alternative?"';
+      break;
+    case 'mistake':
+      lesson = bestMv && bestMv.captured
+        ? 'When the opponent leaves a piece hanging, capture it — never miss free material.'
+        : 'Calculate at least one move ahead. Look for the most forcing reply your opponent can make.';
+      break;
+    case 'blunder':
+      lesson = 'Before pressing the move, run a 2-step check: (1) any of my pieces hanging? (2) any tactical shot like a fork, pin, or back-rank mate?';
+      break;
+    default:
+      lesson = 'Slow down. Forcing moves first — checks, captures, threats — then quiet improvements.';
+  }
+  $('why-lesson').textContent = lesson;
+
+  card.classList.remove('hidden');
+}
+
+
+/* ══════════════════════════════════════════════════════════
+   DATABASE INSIGHT (Lichess Opening Explorer)
+══════════════════════════════════════════════════════════ */
+async function renderDbInsight(fen, bodyId, stateId) {
+  const body  = $(bodyId);
+  const state = $(stateId);
+  if (!body) return;
+  if (state) state.textContent = 'loading…';
+  body.innerHTML = '<span class="db-hint">Querying live database…</span>';
+
+  const result = await API.fetchExplorer(fen);
+
+  // Guard: position may have changed while waiting.
+  if (state) state.textContent = '';
+  if (!result) {
+    body.innerHTML =
+      '<span class="db-fallback">Opening database unavailable. Using built-in feedback instead.</span>';
+    return;
+  }
+
+  const { mode, data } = result;
+  const total = (data.white || 0) + (data.draws || 0) + (data.black || 0);
+  const top = data.moves.slice(0, 5);
+  const grandTotal = top.reduce((s, m) =>
+    s + (m.white || 0) + (m.draws || 0) + (m.black || 0), 0);
+
+  let html = `<div class="db-meta">Source: <b>${mode === 'masters' ? 'master games' : 'lichess (2000+)'}</b> · ${formatCount(total)} games at this position</div>`;
+  html += '<div class="db-rows">';
+  top.forEach(m => {
+    const games = (m.white || 0) + (m.draws || 0) + (m.black || 0);
+    const pct   = grandTotal ? Math.round((games / grandTotal) * 1000) / 10 : 0;
+    const wPct  = games ? Math.round((m.white / games) * 100) : 0;
+    const dPct  = games ? Math.round((m.draws / games) * 100) : 0;
+    const bPct  = games ? Math.round((m.black / games) * 100) : 0;
+    html += `
+      <div class="db-row">
+        <span class="db-san">${m.san}</span>
+        <div class="db-bar" title="${games} games">
+          <span class="db-bar-fill" style="width:${pct}%"></span>
+          <span class="db-bar-text">${pct}% · ${formatCount(games)} games</span>
+        </div>
+        <div class="db-wdl" aria-label="white/draws/black %">
+          <span class="db-wdl-w" style="width:${wPct}%" title="White wins ${wPct}%"></span>
+          <span class="db-wdl-d" style="width:${dPct}%" title="Draws ${dPct}%"></span>
+          <span class="db-wdl-b" style="width:${bPct}%" title="Black wins ${bPct}%"></span>
+        </div>
+      </div>`;
+  });
+  html += '</div>';
+  if (top[0]) {
+    const top1 = top[0];
+    const top1Games = (top1.white || 0) + (top1.draws || 0) + (top1.black || 0);
+    const top1Pct = grandTotal ? Math.round((top1Games / grandTotal) * 100) : 0;
+    html += `<div class="db-takeaway">Most common move: <b>${top1.san}</b>, played ${formatCount(top1Games)} times (${top1Pct}%).</div>`;
+  }
+  body.innerHTML = html;
+}
+function formatCount(n) {
+  if (n == null) return '0';
+  if (n >= 1_000_000) return (n/1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+  if (n >= 1_000)     return (n/1_000).toFixed(1).replace(/\.0$/, '') + 'k';
+  return String(n);
 }
